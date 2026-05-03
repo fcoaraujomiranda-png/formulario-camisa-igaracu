@@ -1,0 +1,42 @@
+FORMULÁRIO DE PEDIDO DE CAMISAS - JUNINA IGARAÇU 2026
+
+ARQUIVOS DO PACOTE
+1. index.html
+   - Este é o formulário pronto para publicar no Netlify.
+   - A imagem da camisa já está incorporada dentro do arquivo, então ele funciona mesmo sem subir imagens separadas.
+
+2. camisa-oficial-2026.jpg
+   - Arquivo da arte oficial, incluído apenas como backup.
+
+3. apps-script-google-sheets.gs
+   - Código opcional para conectar o formulário ao Google Sheets.
+
+COMO PUBLICAR NO NETLIFY
+1. Extraia este arquivo ZIP.
+2. Entre no Netlify.
+3. Arraste a pasta formulario_igaracu_pronto_netlify para o Netlify Drop.
+4. Aguarde gerar o link.
+5. Copie o link e envie para os clientes/brincantes.
+
+IMPORTANTE
+O arquivo principal já está com o nome correto: index.html.
+Isso evita o erro de "Página não encontrada".
+
+WHATSAPP
+O formulário está configurado para enviar os pedidos para este número:
+5586921434354
+
+Para trocar, abra o arquivo index.html e altere a linha:
+const numeroWhatsAppPedidos = "5586921434354";
+
+GOOGLE SHEETS OPCIONAL
+Para salvar os pedidos em uma planilha:
+1. Crie uma planilha no Google Sheets.
+2. Vá em Extensões > Apps Script.
+3. Cole o conteúdo do arquivo apps-script-google-sheets.gs.
+4. Publique como Web App.
+5. Copie a URL gerada.
+6. No index.html, substitua:
+const googleSheetsURL = "COLE_AQUI_A_URL_DO_APPS_SCRIPT";
+
+Depois disso, o formulário enviará para o WhatsApp e também registrará na planilha.
