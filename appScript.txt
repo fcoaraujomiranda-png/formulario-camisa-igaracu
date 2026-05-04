@@ -1,0 +1,131 @@
+const ID_DA_PLANILHA = "1bbgpGzNsZP_KZIPoCnZV26jH4qJJu2XhIF84uxmGRX8";
+const NOME_ABA = "PedidosCamisa";
+
+const CABECALHOS = [
+  "Codigo do pedido",
+  "Nome",
+  "Telefone",
+  "E WhatsApp?",
+  "Categoria",
+  "Tamanho",
+  "Tamanho especial",
+  "Quantidade",
+  "Forma de pagamento",
+  "Status do pagamento",
+  "Observacoes",
+  "Data do envio"
+];
+
+function doGet() {
+  return criarResposta("Conexao ativa com a planilha da camisa Igaracu 2026.");
+}
+
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  let bloqueado = false;
+
+  try {
+    lock.waitLock(30000);
+    bloqueado = true;
+
+    const dados = obterDadosDaRequisicao(e);
+    const aba = obterAbaDePedidos();
+    garantirCabecalhos(aba);
+
+    aba.appendRow([
+      dados.codigoPedido || "",
+      dados.nome || "",
+      dados.telefone || "",
+      dados.whatsapp || "",
+      dados.categoria || "",
+      dados.tamanho || "",
+      dados.especial || "",
+      dados.quantidade || "",
+      dados.pagamento || "",
+      dados.statusPagamento || "",
+      dados.observacoes || "",
+      dados.dataHora || Utilities.formatDate(new Date(), "America/Sao_Paulo", "dd/MM/yyyy HH:mm:ss")
+    ]);
+
+    return criarResposta("Pedido registrado com sucesso.");
+  } catch (erro) {
+    return criarResposta("Erro ao registrar pedido: " + erro);
+  } finally {
+    if (bloqueado) {
+      lock.releaseLock();
+    }
+  }
+}
+
+function obterAbaDePedidos() {
+  const planilha = SpreadsheetApp.openById(ID_DA_PLANILHA);
+  let aba = planilha.getSheetByName(NOME_ABA);
+
+  if (!aba) {
+    aba = planilha.insertSheet(NOME_ABA);
+  }
+
+  return aba;
+}
+
+function garantirCabecalhos(aba) {
+  if (aba.getLastRow() === 0) {
+    aba.appendRow(CABECALHOS);
+    aba.setFrozenRows(1);
+  }
+}
+
+function obterDadosDaRequisicao(e) {
+  const dados = {};
+
+  if (e && e.parameter) {
+    Object.assign(dados, e.parameter);
+  }
+
+  if (e && e.postData && e.postData.contents) {
+    const conteudo = e.postData.contents;
+    const tipo = e.postData.type || "";
+
+    if (tipo.indexOf("application/json") !== -1) {
+      Object.assign(dados, JSON.parse(conteudo));
+    } else if (tipo.indexOf("application/x-www-form-urlencoded") !== -1 && Object.keys(dados).length === 0) {
+      conteudo.split("&").forEach(function (par) {
+        const partes = par.split("=");
+        const chave = decodeURIComponent((partes[0] || "").replace(/\+/g, " "));
+        const valor = decodeURIComponent((partes.slice(1).join("=") || "").replace(/\+/g, " "));
+
+        if (chave) {
+          dados[chave] = valor;
+        }
+      });
+    }
+  }
+
+  return dados;
+}
+
+function criarResposta(mensagem) {
+  return ContentService
+    .createTextOutput(mensagem)
+    .setMimeType(ContentService.MimeType.TEXT);
+}
+
+function testeManual() {
+  const aba = obterAbaDePedidos();
+  garantirCabecalhos(aba);
+
+  aba.appendRow([
+    "TESTE-001",
+    "Teste de conexao",
+    "86999999999",
+    "Sim",
+    "Teste",
+    "M",
+    "",
+    "1",
+    "Pix",
+    "Aguardando confirmacao",
+    "Linha de teste criada pelo Apps Script",
+    Utilities.formatDate(new Date(), "America/Sao_Paulo", "dd/MM/yyyy HH:mm:ss")
+  ]);
+}

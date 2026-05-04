@@ -1,7 +1,7 @@
 const numeroWhatsAppPedidos = "5586921434354";
 
 // URL da implantação do Apps Script que registra os pedidos na planilha.
-const googleSheetsURL = "https://script.google.com/macros/s/AKfycbxsRMiDrbkGdfcM3GSpMFfiqd8z5G74IAmvi1JMFOznlZY4uWC8gFJ8fiWaMmenMuiE/exec";
+const googleSheetsURL = "https://script.google.com/macros/s/AKfycbyZJ1_bK_2ZSsxdpTEbdMWuk-yIUjyZynC-eVPP2eI7SNctuAsmhgdVLYhW9KUZ0vlJ/exec";
 
 const form = document.getElementById("formularioVisivel");
 const formEnvio = document.getElementById("formEnvioSheets");
@@ -84,25 +84,51 @@ function gerarResumo() {
 
 async function enviarParaSheets() {
     const dados = pegarDados();
+    return enviarPorFormularioOcultoConfirmado(dados);
+}
 
-    if (window.fetch) {
-        const corpo = new URLSearchParams();
+function enviarPorFormularioOcultoConfirmado(dados) {
+    return new Promise((resolve, reject) => {
+        if (!formEnvio) {
+            reject(new Error("Formulario oculto de envio nao encontrado."));
+            return;
+        }
+
+        let iframe = document.getElementById("iframeEnvioSheets");
+        if (!iframe) {
+            iframe = document.createElement("iframe");
+            iframe.id = "iframeEnvioSheets";
+            iframe.name = "iframeEnvioSheets";
+            iframe.style.display = "none";
+            document.body.appendChild(iframe);
+        }
+
+        const tempoLimite = window.setTimeout(() => {
+            iframe.onload = null;
+            reject(new Error("Tempo limite ao enviar para a planilha."));
+        }, 15000);
+
+        iframe.onload = () => {
+            window.clearTimeout(tempoLimite);
+            iframe.onload = null;
+            resolve("enviado");
+        };
+
+        formEnvio.action = googleSheetsURL;
+        formEnvio.method = "POST";
+        formEnvio.target = "iframeEnvioSheets";
+        formEnvio.innerHTML = "";
+
         Object.entries(dados).forEach(([chave, valor]) => {
-            corpo.append(chave, valor);
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = chave;
+            input.value = valor;
+            formEnvio.appendChild(input);
         });
 
-        await fetch(googleSheetsURL, {
-            method: "POST",
-            mode: "no-cors",
-            cache: "no-store",
-            body: corpo
-        });
-
-        return "enviado";
-    }
-
-    enviarPorFormularioOculto(dados);
-    return "enviado";
+        formEnvio.submit();
+    });
 }
 
 function enviarPorFormularioOculto(dados) {
