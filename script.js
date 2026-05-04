@@ -84,28 +84,51 @@ function gerarResumo() {
 
 async function enviarParaSheets() {
     const dados = pegarDados();
+    return enviarPorGetComIframe(dados);
+}
 
-    if (window.fetch) {
-        const corpo = new URLSearchParams();
+function enviarPorGetComIframe(dados) {
+    return new Promise((resolve, reject) => {
+        if (!formEnvio) {
+            reject(new Error("Formulario oculto de envio nao encontrado."));
+            return;
+        }
+
+        let iframe = document.getElementById("iframeEnvioSheets");
+        if (!iframe) {
+            iframe = document.createElement("iframe");
+            iframe.id = "iframeEnvioSheets";
+            iframe.name = "iframeEnvioSheets";
+            iframe.style.display = "none";
+            document.body.appendChild(iframe);
+        }
+
+        const tempoLimite = window.setTimeout(() => {
+            iframe.onload = null;
+            reject(new Error("Tempo limite ao enviar para a planilha."));
+        }, 15000);
+
+        iframe.onload = () => {
+            window.clearTimeout(tempoLimite);
+            iframe.onload = null;
+            resolve("enviado");
+        };
+
+        formEnvio.action = googleSheetsURL;
+        formEnvio.method = "GET";
+        formEnvio.target = "iframeEnvioSheets";
+        formEnvio.innerHTML = "";
+
         Object.entries(dados).forEach(([chave, valor]) => {
-            corpo.append(chave, valor);
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = chave;
+            input.value = valor;
+            formEnvio.appendChild(input);
         });
 
-        try {
-            await fetch(googleSheetsURL, {
-                method: "POST",
-                mode: "no-cors",
-                cache: "no-store",
-                body: corpo
-            });
-
-            return "enviado";
-        } catch (error) {
-            return enviarPorFormularioOcultoConfirmado(dados);
-        }
-    }
-
-    return enviarPorFormularioOcultoConfirmado(dados);
+        formEnvio.submit();
+    });
 }
 
 function enviarPorFormularioOcultoConfirmado(dados) {

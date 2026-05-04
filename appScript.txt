@@ -16,11 +16,19 @@ const CABECALHOS = [
   "Data do envio"
 ];
 
-function doGet() {
+function doGet(e) {
+  if (e && e.parameter && e.parameter.codigoPedido) {
+    return registrarPedido(e);
+  }
+
   return criarResposta("Conexao ativa com a planilha da camisa Igaracu 2026.");
 }
 
 function doPost(e) {
+  return registrarPedido(e);
+}
+
+function registrarPedido(e) {
   const lock = LockService.getScriptLock();
   let bloqueado = false;
 
