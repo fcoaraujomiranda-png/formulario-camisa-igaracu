@@ -84,6 +84,27 @@ function gerarResumo() {
 
 async function enviarParaSheets() {
     const dados = pegarDados();
+
+    if (window.fetch) {
+        const corpo = new URLSearchParams();
+        Object.entries(dados).forEach(([chave, valor]) => {
+            corpo.append(chave, valor);
+        });
+
+        try {
+            await fetch(googleSheetsURL, {
+                method: "POST",
+                mode: "no-cors",
+                cache: "no-store",
+                body: corpo
+            });
+
+            return "enviado";
+        } catch (error) {
+            return enviarPorFormularioOcultoConfirmado(dados);
+        }
+    }
+
     return enviarPorFormularioOcultoConfirmado(dados);
 }
 
