@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pedido de Camisa | Junina Igaraçu 2026</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="pattern"></div>
+
+  <main id="appConteudo" class="container">
+    <section class="hero">
+      <span class="tag">Encomendas abertas</span>
+      <h1>Camisa Oficial<br>Igaraçu 2026</h1>
+      <p class="subtitle">
+        Preencha seus dados, escolha o tamanho e confirme seu pedido pelo WhatsApp.
+      </p>
+
+      <div class="product-preview">
+        <img src="./src/img/camisa-oficial-2026.jpg">
+        <p class="product-caption">
+          Tema 2026: <strong>O Feiticeiro do Cangaço</strong> — uma história a contrapelo. Confira a arte oficial antes
+          de finalizar seu pedido.
+        </p>
+      </div>
+    </section>
+
+    <section class="form-card">
+      <div class="notice">
+        Atenção: o envio pelo WhatsApp funciona como confirmação do pedido. Após preencher, clique no botão final e
+        envie a mensagem que abrirá no WhatsApp.
+      </div>
+
+      <form id="pedidoForm" style="display: none;"></form>
+
+      <form id="formEnvioSheets" action="" method="POST" style="display: none;"></form>
+
+      <form id="formularioVisivel">
+        <h2 class="section-title">Dados do cliente</h2>
+
+        <label for="nome">Nome e sobrenome <span class="required">*</span></label>
+        <input id="nome" name="nome" type="text" placeholder="Ex: Maria Silva" required />
+
+        <div class="grid">
+          <div>
+            <label for="telefone">Telefone para contato <span class="required">*</span></label>
+            <input id="telefone" name="telefone" type="tel" placeholder="(86) 99999-9999" required />
+          </div>
+
+          <div>
+            <label for="whatsapp">Esse número é WhatsApp? <span class="required">*</span></label>
+            <select id="whatsapp" name="whatsapp" required>
+              <option value="">Selecione</option>
+              <option value="Sim">Sim</option>
+              <option value="Não">Não</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="categoria">Você é</label>
+        <select id="categoria" name="categoria">
+          <option value="Não informado">Selecione, se desejar</option>
+          <option value="Brincante">Brincante</option>
+          <option value="Familiar de brincante">Familiar de brincante</option>
+          <option value="Apoiador">Apoiador</option>
+          <option value="Público geral">Público geral</option>
+        </select>
+
+        <h2 class="section-title">Camisa</h2>
+
+        <div class="grid">
+          <div>
+            <label for="tamanho">Tamanho da camisa <span class="required">*</span></label>
+            <select id="tamanho" name="tamanho" required>
+              <option value="">Selecione o tamanho</option>
+              <option value="PP">PP</option>
+              <option value="P">P</option>
+              <option value="M">M</option>
+              <option value="G">G</option>
+              <option value="GG">GG</option>
+              <option value="XG">XG</option>
+              <option value="Infantil 0 a 1 ano">Infantil 0 a 1 ano</option>
+              <option value="Infantil 2 anos">Infantil 2 anos</option>
+              <option value="Infantil 4 anos">Infantil 4 anos</option>
+              <option value="Infantil 6 anos">Infantil 6 anos</option>
+              <option value="Infantil 8 anos">Infantil 8 anos</option>
+              <option value="Infantil 10 anos">Infantil 10 anos</option>
+              <option value="Tamanho especial">Tamanho especial</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="quantidade">Quantidade <span class="required">*</span></label>
+            <select id="quantidade" name="quantidade" required>
+              <option value="">Selecione</option>
+              <option value="1">1 camisa</option>
+              <option value="2">2 camisas</option>
+              <option value="3">3 camisas</option>
+              <option value="Mais de 3">Mais de 3 camisas</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="especialBox" class="hidden">
+          <label for="especial">Informe o tamanho especial</label>
+          <input id="especial" name="especial" type="text"
+            placeholder="Ex: XXG, infantil 12 anos, medida personalizada" />
+        </div>
+
+        <h2 class="section-title">Pagamento e retirada</h2>
+
+        <div class="grid">
+          <div>
+            <label for="pagamento">Forma de pagamento <span class="required">*</span></label>
+            <select id="pagamento" name="pagamento" required>
+              <option value="">Selecione</option>
+              <option value="Pix">Pix</option>
+              <option value="Dinheiro">Dinheiro</option>
+              <option value="Cartão">Cartão</option>
+              <option value="Ainda vou confirmar">Ainda vou confirmar</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="statusPagamento">Status do pagamento</label>
+            <select id="statusPagamento" name="statusPagamento">
+              <option value="Aguardando confirmação">Aguardando confirmação</option>
+              <option value="Já paguei e vou enviar o comprovante">Já paguei e vou enviar o comprovante</option>
+              <option value="Vou pagar depois">Vou pagar depois</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="observacoes">Observações</label>
+        <textarea id="observacoes" name="observacoes"
+          placeholder="Ex: pedido para casal, retirada com outra pessoa, dúvida sobre tamanho..."></textarea>
+
+        <div class="check-row">
+          <input id="confirmacao" name="confirmacao" type="checkbox" required />
+          <label for="confirmacao">Confirmo que revisei meus dados e sei que o pedido será finalizado após confirmação
+            da organização. <span class="required">*</span></label>
+        </div>
+
+        <button class="btn" type="submit">Enviar pedido e confirmar no WhatsApp</button>
+        <button class="btn copy-btn" type="button" id="copiarResumo">Copiar resumo do pedido</button>
+        <a id="abrirWhatsApp" class="whatsapp-link" href="#" target="_blank" rel="noopener noreferrer">Abrir confirmação
+          no WhatsApp</a>
+
+        <div class="status" id="statusEnvio"></div>
+        <div class="summary" id="resumoPedido"></div>
+      </form>
+    </section>
+
+    <p class="footer">
+      Junina Igaraçu 2026 — É pressão no coração!<br>
+      Formulário criado para organização dos pedidos da camisa oficial.
+    </p>
+  </main>
+
+  <section id="paginaSucesso" class="container success-page hidden" aria-live="polite">
+    <div class="success-card">
+      <span class="tag success-tag">Pedido enviado</span>
+      <h1>Seu pedido foi registrado</h1>
+      <p class="subtitle success-subtitle">
+        A organização recebeu seus dados e a confirmação será finalizada no WhatsApp.
+      </p>
+
+      <div class="success-summary" id="resumoSucesso"></div>
+
+      <div class="success-actions">
+        <a id="abrirWhatsAppSucesso" class="whatsapp-link" href="#" target="_blank" rel="noopener noreferrer">
+          Abrir confirmação no WhatsApp
+        </a>
+        <button type="button" class="btn copy-btn" id="novoPedido">Fazer outro pedido</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js" defer></script>
+</body>
+
+</html>
