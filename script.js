@@ -8,7 +8,6 @@ const formEnvio = document.getElementById("formEnvioSheets");
 const tamanho = document.getElementById("tamanho");
 const especialBox = document.getElementById("especialBox");
 const resumoPedido = document.getElementById("resumoPedido");
-const copiarResumo = document.getElementById("copiarResumo");
 const abrirWhatsApp = document.getElementById("abrirWhatsApp");
 const statusEnvio = document.getElementById("statusEnvio");
 const appConteudo = document.getElementById("appConteudo");
@@ -16,11 +15,17 @@ const paginaSucesso = document.getElementById("paginaSucesso");
 const resumoSucesso = document.getElementById("resumoSucesso");
 const abrirWhatsAppSucesso = document.getElementById("abrirWhatsAppSucesso");
 const novoPedido = document.getElementById("novoPedido");
+const confirmacao = document.getElementById("confirmacao");
+const enviarPedido = document.getElementById("enviarPedido");
 
 let codigoPedidoAtual = "";
 
 tamanho.addEventListener("change", () => {
     especialBox.classList.toggle("hidden", tamanho.value !== "Tamanho especial");
+});
+
+confirmacao.addEventListener("change", () => {
+    enviarPedido.disabled = !confirmacao.checked;
 });
 
 function criarCodigoPedido() {
@@ -38,13 +43,13 @@ function pegarDados() {
         codigoPedido: criarCodigoPedido(),
         nome: document.getElementById("nome").value.trim(),
         telefone: document.getElementById("telefone").value.trim(),
-        whatsapp: document.getElementById("whatsapp").value,
+        whatsapp: "Sim",
         categoria: document.getElementById("categoria").value,
         tamanho: document.getElementById("tamanho").value,
         especial: document.getElementById("especial").value.trim(),
         quantidade: document.getElementById("quantidade").value,
         pagamento: document.getElementById("pagamento").value,
-        statusPagamento: document.getElementById("statusPagamento").value,
+        statusPagamento: "Não informado",
         observacoes: document.getElementById("observacoes").value.trim(),
         dataHora: new Date().toLocaleString("pt-BR")
     };
@@ -61,8 +66,6 @@ function gerarResumo() {
 ` +
         `Telefone: ${dados.telefone}
 ` +
-        `É WhatsApp?: ${dados.whatsapp}
-` +
         `Categoria: ${dados.categoria}
 ` +
         `Tamanho: ${dados.tamanho}${dados.especial ? ` - ${dados.especial}` : ""}
@@ -70,8 +73,6 @@ function gerarResumo() {
         `Quantidade: ${dados.quantidade}
 ` +
         `Forma de pagamento: ${dados.pagamento}
-` +
-        `Status do pagamento: ${dados.statusPagamento}
 ` +
         `Observações: ${dados.observacoes || "Nenhuma"}
 ` +
@@ -83,8 +84,40 @@ function gerarResumo() {
 
 async function enviarParaSheets() {
     const dados = pegarDados();
+
+    if (window.fetch) {
+        const corpo = new URLSearchParams();
+        Object.entries(dados).forEach(([chave, valor]) => {
+            corpo.append(chave, valor);
+        });
+
+        await fetch(googleSheetsURL, {
+            method: "POST",
+            mode: "no-cors",
+            cache: "no-store",
+            body: corpo
+        });
+
+        return "enviado";
+    }
+
+    enviarPorFormularioOculto(dados);
+    return "enviado";
+}
+
+function enviarPorFormularioOculto(dados) {
+    let iframe = document.getElementById("iframeEnvioSheets");
+    if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.id = "iframeEnvioSheets";
+        iframe.name = "iframeEnvioSheets";
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+    }
+
     formEnvio.action = googleSheetsURL;
     formEnvio.method = "POST";
+    formEnvio.target = "iframeEnvioSheets";
     formEnvio.innerHTML = "";
     
     Object.entries(dados).forEach(([chave, valor]) => {
@@ -97,7 +130,6 @@ async function enviarParaSheets() {
     
     // Enviar o formulário
     formEnvio.submit();
-    return "enviado";
 }
 
 function abrirConfirmacaoWhatsApp(resumo) {
@@ -122,6 +154,11 @@ function mostrarPaginaSucesso(resumo) {
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!confirmacao.checked) {
+        enviarPedido.disabled = true;
+        return;
+    }
+
     if (!form.checkValidity()) {
         form.reportValidity();
         return;
@@ -132,6 +169,8 @@ form.addEventListener("submit", async (event) => {
     resumoPedido.textContent = resumo;
     statusEnvio.style.display = "block";
     statusEnvio.textContent = "Gerando confirmação do pedido...";
+
+    enviarPedido.disabled = true;
 
     try {
         const statusPlanilha = await enviarParaSheets();
@@ -150,22 +189,10 @@ novoPedido.addEventListener("click", () => {
     paginaSucesso.classList.add("hidden");
     appConteudo.classList.remove("hidden");
     form.reset();
+    enviarPedido.disabled = true;
     especialBox.classList.add("hidden");
     resumoPedido.style.display = "none";
     statusEnvio.style.display = "none";
     abrirWhatsApp.style.display = "none";
     window.scrollTo({ top: 0, behavior: "smooth" });
-});
-
-copiarResumo.addEventListener("click", async () => {
-    const resumo = gerarResumo();
-    resumoPedido.style.display = "block";
-    resumoPedido.textContent = resumo;
-    try {
-        await navigator.clipboard.writeText(resumo);
-        copiarResumo.textContent = "Resumo copiado!";
-        setTimeout(() => copiarResumo.textContent = "Copiar resumo do pedido", 1800);
-    } catch (error) {
-        alert("Não foi possível copiar automaticamente. Selecione o resumo e copie manualmente.");
-    }
 });
