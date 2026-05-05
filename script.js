@@ -1,7 +1,7 @@
 const numeroWhatsAppPedidos = "5586921434354";
 
 // URL da implantação do Apps Script que registra os pedidos na planilha.
-const googleSheetsURL = "1bbgpGzNsZP_KZIPoCnZV26jH4qJJu2XhIF84uxmGRX8";
+const googleSheetsURL = "https://script.google.com/macros/s/AKfycbyZJ1_bK_2ZSsxdpTEbdMWuk-yIUjyZynC-eVPP2eI7SNctuAsmhgdVLYhW9KUZ0vlJ/exec";
 
 const form = document.getElementById("formularioVisivel");
 const formEnvio = document.getElementById("formEnvioSheets");
